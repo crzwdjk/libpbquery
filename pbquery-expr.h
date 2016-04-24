@@ -1,19 +1,4 @@
-/* Grammar */
-/* path: <node> [ '.' <node> ]*
-   node: <ident> [ '[' <expr> | <list> '] ]?
-   expr: [ <int> | <relation> ]
-   relation: <item> = <item>
-           | <item> != <item>
-           | <item> =~ <regex>
-           | <item> in <list>
-   item: <path> | <lit> | '@'
-   lit: <str> | <int> | <float>
-   list: <lit> [',' <lit>]*
-   ident: [a-zA-Z_][a-zA-Z0-9]*
-   int: '-'? [0-9]+
-   float: '-'? [0-9]+ '.' [0-9]*
-*/
-
+/* A pbquery path: a sequence of message selectors and filters */
 struct pbq_path {
     ProtobufCMessageDescriptor *ctx;
     size_t count;
@@ -21,6 +6,9 @@ struct pbq_path {
     struct pbq_filter *filters;
 };
 
+/* A pbquery filter expression.
+   Note that by convention, in a comparison the left side is a path while
+   the right side can be a constant or path. */
 enum pbq_filtertype { FILTER_LIST, FILTER_EQ, FILTER_MATCH, FILTER_NONE, FILTER_IDX };
 struct pbq_filter {
     enum pbq_filtertype type;
@@ -43,6 +31,7 @@ struct pbq_filter {
     } v;
 };
 
+/* A single item from a pbquery expression. */
 enum pbq_itemtype { ITEM_INT, ITEM_FLOAT, ITEM_STR, ITEM_PATH, ITEM_AT };
 struct pbq_item {
     enum pbq_itemtype type;
