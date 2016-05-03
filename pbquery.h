@@ -33,14 +33,4 @@ extern void pbquery_free_result(struct pbquery_result *);
 extern void pbquery_free_stmt(struct pbquery_stmt *);
 
 
-#include <stdarg.h>
-static void pbquery_debug(char *format, ...)
-{
-    va_list ap;
-    va_start(ap, format);
-    vfprintf(stderr, format, ap);
-    va_end(ap);
-}
-
-
 #endif

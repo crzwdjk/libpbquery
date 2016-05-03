@@ -55,8 +55,8 @@ ProtobufCMessageDescriptor *pbquery_init(void *libhandle, const char *rootname)
     ProtobufCMessageDescriptor *root_descriptor = dlsym(libhandle, sym_name);
     free(sym_name);
     if (!root_descriptor) {
-        pbquery_debug("Could not load descriptor %s (%s): %s",
-                      messagename, messagename_munged, dlerror());
+        fprintf(stderr, "Could not load descriptor %s (%s): %s",
+                messagename, messagename_munged, dlerror());
         errno = ENOENT;
     }
 

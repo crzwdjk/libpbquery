@@ -9,6 +9,16 @@
 #include "pbquery-expr.h"
 
 
+static void pbquery_debug(char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    vfprintf(stderr, format, ap);
+    va_end(ap);
+}
+
+
+
 static struct pbq_path *parse_path(const char *query_string,
                                    ProtobufCMessageDescriptor *ctx,
                                    size_t *len);
