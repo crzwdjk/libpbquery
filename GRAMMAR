@@ -5,7 +5,7 @@ Grammar
    relation: <item> = <item>
            | <item> != <item>
            | <item> =~ <regex>
-           | <item> in <list>
+           | <item> in '(' <list> ')'
    item: <path> | <lit> | '@'
    lit: <str> | <int> | <float>
    list: <lit> [',' <lit>]*

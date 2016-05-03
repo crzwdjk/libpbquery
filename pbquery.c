@@ -205,9 +205,23 @@ static int eval_filter(slice msg, struct pbq_filter *filter)
 
         return filter->v.eq_filter.invert ? !result : result;
     }
-    case FILTER_LIST:
-        assert(0);
+    case FILTER_LIST: {
+        // TODO: replace with bsearch/hash lookup
+        size_t nitems = filter->v.in_filter.nitems;
+        struct pbq_item *item = filter->v.in_filter.left;
+        struct pbq_item **items = filter->v.in_filter.right;
+        assert(item->type == ITEM_PATH);
+
+        slice submsg = find_path(msg.buf, msg.len, item->v.path);
+        if (!submsg.buf) return 0;
+
+        for (int i = 0; i < nitems; i++) {
+            if (pb_compare_val(submsg, items[i])) {
+                return 1;
+            }
+        }
         return 0;
+    }
     case FILTER_MATCH:
         assert(0);
         return 0;

@@ -26,7 +26,7 @@ struct pbq_filter {
         struct {
             struct pbq_item *left;
             size_t nitems;
-            struct pbq_item *right;
+            struct pbq_item **right;
         } in_filter;
     } v;
 };

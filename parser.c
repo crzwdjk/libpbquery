@@ -93,6 +93,32 @@ static struct pbq_item *parse_item(const char *string,
     return item;
 }
 
+static struct pbq_item **parse_list(const char *string, size_t *end,
+                            ProtobufCMessageDescriptor *ctx,
+                            size_t *count)
+{
+    const char *orig = string;
+    size_t nitems = 0;
+    struct pbq_item **ret = NULL;
+    do {
+        if (string[0] == ',') string++;
+        string = chomp_ws(string);
+        size_t incr;
+        struct pbq_item *item = parse_item(string, ctx, &incr);
+        string += incr;
+        if (!item) {
+            break;
+        }
+        nitems++;
+        ret = realloc(ret, nitems);
+        ret[nitems - 1] = item;
+        string = chomp_ws(string);
+    } while(*string == ',');
+    *end = string - orig;
+    *count = nitems;
+    return ret;
+}
+
 //   expr: [ <int> | <relation> ]
 //   relation: <item> = <item>
 //           | <item> != <item>
@@ -117,6 +143,7 @@ static int parse_filter(const char *string,
             filter->type = FILTER_IDX;
             filter->v.idx = item->v.intval;
         } else {
+            free(item);
             return 0;
         }
     }
@@ -141,8 +168,25 @@ static int parse_filter(const char *string,
         return 0;
     }
     else if (string[0] == 'i' && string[1] == 'n') {
-        // XXX: parse list
-        return 0;
+        string += 2;
+        string = chomp_ws(string);
+        // TODO: left item should have type that is not MESSAGE
+
+        if (*string++ != '(') {
+            free(item);
+            return 0;
+        }
+        filter->type = FILTER_LIST;
+        filter->v.in_filter.left = item;
+        filter->v.in_filter.right = parse_list(string, &incr, ctx,
+                                               &(filter->v.in_filter.nitems));
+        string += incr;
+        string = chomp_ws(string);
+        if (*string++ != ')') {
+            free(filter->v.in_filter.right);
+            free(item);
+            return 0;
+        }
     }
     string = chomp_ws(string);
     *end = string - orig_s;
