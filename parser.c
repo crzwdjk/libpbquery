@@ -57,7 +57,7 @@ static struct pbq_item *parse_item(const char *string,
             p++;
             len++;
         }
-        item->v.strval = malloc(len + 1);
+        item->v.strval = calloc(1, len + 1);
         *end = (p + 1) - string;
         p = string + 1;
         for (size_t i = 0; i < len; i++) {
